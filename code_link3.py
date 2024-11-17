@@ -1,75 +1,90 @@
-# Mengimpor library yang diperlukan
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+import tensorflow as tf
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.utils import to_categorical
+ 
+# Memuat data CIFAR-10
+(train_images, train_labels), (test_images, test_labels) = cifar10.load_data()
+ 
+# Normalisasi data gambar
+train_images = train_images.astype('float32') / 255.0
+test_images = test_images.astype('float32') / 255.0
+ 
+# Mengonversi label ke bentuk kategorikal
+train_labels = to_categorical(train_labels, 10)
+test_labels = to_categorical(test_labels, 10)
+ 
+# Sekarang, 'train_images' dan 'train_labels' siap digunakan untuk pelatihan model.
+ 
+ 
+# Membangun model CNN
+model = tf.keras.Sequential([
+    # Layer konvolusi pertama
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+ 
+    # Layer konvolusi kedua
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+ 
+    # Layer konvolusi ketiga
+    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+ 
+    # Flattening output untuk menginputkannya ke dalam Dense layer
+    tf.keras.layers.Flatten(),
+ 
+    # Dense layer dengan Dropout
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+ 
+    # Layer output
+    tf.keras.layers.Dense(10, activation='softmax') # dikarenakan ada 10 kelas
+])
+ 
+# Menampilkan ringkasan model
+model.summary()
+ 
+# Kompilasi model
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+ 
+# Pelatihan model
+history = model.fit(train_images, train_labels, epochs=10, batch_size=64, validation_data=(test_images, test_labels))
+ 
+ 
+# Evaluasi model pada data tes
+test_loss, test_acc = model.evaluate(test_images, test_labels)
+print('Test accuracy:', test_acc)
 
-# Inisialisasi CNN
-MesinKlasifikasi = Sequential()
 
-# Langkah 1 - Convolution
-MesinKlasifikasi.add(Conv2D(filters = 32, kernel_size=(3, 3), input_shape = (128, 128, 3), activation = 'relu'))
-
-# Langkah 2 - Pooling
-MesinKlasifikasi.add(MaxPooling2D(pool_size = (2, 2)))
-
-# Menambah convolutional layer
-MesinKlasifikasi.add(Conv2D(32, (3, 3), activation = 'relu'))
-MesinKlasifikasi.add(MaxPooling2D(pool_size = (2, 2)))
-
-# Langkah 3 - Flattening
-MesinKlasifikasi.add(Flatten())
-
-# Langkah 4 - Full connection
-MesinKlasifikasi.add(Dense(units = 128, activation = 'relu'))
-MesinKlasifikasi.add(Dense(units = 1, activation = 'sigmoid'))
-
-# Menjalankan CNN
-MesinKlasifikasi.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
-
-# Menjalankan CNN ke training dan test set
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
-train_datagen = ImageDataGenerator(rescale = 1./255,
-                                   shear_range = 0.2,
-                                   zoom_range = 0.2,
-                                   horizontal_flip = True)
-
-test_datagen = ImageDataGenerator(rescale = 1./255)
-
-training_set = train_datagen.flow_from_directory('dataset/training_set',
-                                                 target_size = (128, 128),
-                                                 batch_size = 32,
-                                                 class_mode = 'binary')
-
-test_set = test_datagen.flow_from_directory('dataset/test_set',
-                                            target_size = (128, 128),
-                                            batch_size = 32,
-                                            class_mode = 'binary')
-
-MesinKlasifikasi.fit_generator(training_set,
-                         steps_per_epoch = 8000/32,
-                         epochs = 50,
-                         validation_data = test_set,
-                         validation_steps = 2000/32)
-
-
-# Uji coba lagi di test_set
+from google.colab import files
+from keras.models import load_model
+from PIL import Image
 import numpy as np
-from keras.preprocessing import image
-count_dog = 0
-count_cat = 0
-for i in range(4001, 5001): 
-    test_image = image.load_img('dataset/test_set/dogs/dog.' + str(i) + '.jpg', target_size = (128, 128))
-    test_image = image.img_to_array(test_image)
-    test_image = np.expand_dims(test_image, axis = 0)
-    result = MesinKlasifikasi.predict(test_image)
-    training_set.class_indices
-    if result[0][0] == 0:
-        prediction = 'cat'
-        count_cat = count_cat + 1
-    else:
-        prediction = 'dog'
-        count_dog = count_dog + 1
-
-# Mencetak hasil prediksinya agar bisa dibaca
-print("count_dog:" + str(count_dog))    
-print("count_cat:" + str(count_cat))
+ 
+# Fungsi untuk memuat dan memproses gambar
+def load_and_prepare_image(file_path):
+    img = Image.open(file_path)
+    img = img.resize((32, 32))  # Sesuaikan dengan dimensi yang model Anda harapkan
+    img = np.array(img) / 255.0  # Normalisasi
+    img = np.expand_dims(img, axis=0)  # Tambahkan batch dimension
+    return img
+ 
+# Nama-nama kelas untuk dataset CIFAR-10
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+ 
+# Muat model
+#model = load_model('path_to_your_model.h5')  # Ganti dengan path ke model yang disimpan
+ 
+# Mengunggah file gambar
+uploaded = files.upload()
+ 
+# Memproses gambar dan membuat prediksi
+for filename in uploaded.keys():
+    img = load_and_prepare_image(filename)
+    prediction = model.predict(img)
+    predicted_class_index = np.argmax(prediction, axis=1)[0]  # Dapatkan indeks kelas
+    predicted_class_name = class_names[predicted_class_index]  # Dapatkan nama kelas
+    print(f'File: {filename}, Predicted Class Index: {predicted_class_index}, Predicted Class Name: {predicted_class_name}')
+ 
