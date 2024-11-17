@@ -155,10 +155,39 @@ penjelasan
 - print('Test accuracy:', test_acc)
 
 # Output yang dihasilkan :
-![image](https://github.com/user-attachments/assets/7c7b91c6-fb2c-439c-94ee-2148048ff5c7)
-![image](https://github.com/user-attachments/assets/d3666314-d093-416f-a856-1f8511fee23f)
-
+![image](https://github.com/user-attachments/assets/493066f1-bb56-41f9-834d-2d3ef538c620)
 Setelah model CNN dibangun dan dilatih, kita dapat melakukan proses inference pada data gambar yang belum pernah dilihat sebelumnya. Model CNN akan memberikan prediksi kelas dari gambar tersebut berdasarkan apa yang telah dipelajari selama proses pelatihan. 
 
 # code 2
+![image](https://github.com/user-attachments/assets/97718428-b0e3-4057-9203-f83395a5f102)
+penjelassan 
 
+# Import Libraries
+![image](https://github.com/user-attachments/assets/1e075ce5-cd92-464f-8ea4-116b043e7bdb)
+- files.upload(): Digunakan untuk mengunggah file dari komputer ke lingkungan Google Colab.
+- load_model(): Digunakan untuk memuat model yang telah dilatih sebelumnya.
+- Image: Digunakan untuk memproses dan mengubah gambar menjadi format yang sesuai.
+- np: Mengimpor library NumPy untuk manipulasi array, yang diperlukan untuk memproses gambar.
+
+# Fungsi load_and_prepare_image
+![image](https://github.com/user-attachments/assets/bf2cb2c4-30e4-413a-9ccc-da925dcc264b)
+Fungsi ini menerima path gambar, membuka gambar, mengubah ukuran gambar menjadi 32x32 piksel (dimensi yang umumnya digunakan untuk dataset CIFAR-10), menormalisasi nilai piksel ke rentang [0, 1] dengan membagi 255, dan menambahkan dimensi batch untuk memastikan format input sesuai dengan yang diharapkan oleh model.
+
+# Daftar Kelas
+![image](https://github.com/user-attachments/assets/c6217b34-84c2-449c-a92e-7ccf683ace28)
+Daftar ini berisi nama-nama kelas yang digunakan dalam dataset CIFAR-10. Model akan memprediksi salah satu dari kelas-kelas ini.
+
+# Mengunggah Gambar
+![image](https://github.com/user-attachments/assets/2999a733-56f3-4335-b0eb-0dd4abc01027)
+Fungsi ini akan membuka dialog untuk mengunggah file gambar dari komputer lokal pengguna ke lingkungan Colab.
+
+# Proses Gambar dan Prediksi
+![image](https://github.com/user-attachments/assets/46d0f820-21c9-45b5-af02-8df8705cbb12)
+- Kode ini mengulang setiap file yang diunggah dan memprosesnya dengan memanggil fungsi load_and_prepare_image.
+- Setelah gambar diproses, model.predict(img) digunakan untuk menghasilkan prediksi dari model.
+- np.argmax(prediction, axis=1) mengambil indeks kelas dengan probabilitas tertinggi.
+- Prediksi kelas tersebut kemudian diterjemahkan menjadi nama kelas dengan mengambil nilai dari class_names sesuai dengan indeks yang didapatkan.
+- Hasilnya akan mencetak nama file gambar beserta indeks dan nama kelas yang diprediksi oleh model.
+
+# output
+![image](https://github.com/user-attachments/assets/207e162f-fe5f-4cd8-b57c-2c062fd043b6)
