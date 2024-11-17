@@ -92,61 +92,73 @@ serta mencetak jumlah prediksi untuk masing-masing kategori.
 
 
 # MODUL 3 Deep Learning: Convolutional Neural Networks (aplikasi)
+        Convolutional Neural Network (CNN) adalah salah satu jenis Artificial Neural Network yang dirancang khusus untuk memproses data dalam bentuk gambar. CNN memiliki kemampuan mengenali pola dan mempelajari fitur-fitur pada gambar melalui beberapa lapisan (layer) dengan fungsi spesifik. Lapisan utama pada CNN meliputi Convolutional Layer, Pooling Layer, Flatten Layer, dan Fully Connected Layer. Convolutional Layer bertugas melakukan operasi konvolusi pada input untuk mengekstraksi fitur dengan parameter yang dapat diatur, seperti jumlah filter, ukuran filter, dan stride. Selanjutnya, Pooling Layer melakukan operasi downsampling untuk mengurangi dimensi data dan menjaga fitur penting, yang juga ditentukan oleh ukuran filter dan stride. Flatten Layer berfungsi untuk mengubah data multidimensi yang dihasilkan oleh Convolutional dan Pooling Layer menjadi satu dimensi, memungkinkan data tersebut diolah lebih lanjut oleh Fully Connected Layer. Fully Connected Layer menghubungkan setiap neuron pada layer sebelumnya ke setiap neuron di layer berikutnya, memungkinkan pengambilan keputusan berdasarkan fitur-fitur yang telah dipelajari. Dengan kombinasi lapisan-lapisan ini, CNN menjadi alat yang sangat efektif untuk pengenalan pola dalam data visual.
 
-![2](https://github.com/user-attachments/assets/79e290e4-0bac-41bc-9b26-27c517d89dd9)
+# Code 1
+![3](https://github.com/user-attachments/assets/08309c81-7dda-4365-ab95-763676c97466)
+penjelasan
 
-Berikut adalah penjelasan tentang implementasi CNN (Convolutional Neural Network) yang lebih sederhana dalam bahasa Indonesia:
-# Impor Library
-mengimpor semua pustaka yang diperlukan untuk membangun CNN. Beberapa pustaka utama yang digunakan adalah:
- - Sequential: Untuk memulai dan mengatur urutan layer dalam neural network.
- - Convolution2D: Untuk melakukan proses convolution, yang merupakan tahap pertama dalam CNN, di mana fitur gambar diekstraksi.
- - MaxPooling2D: Setelah proses convolution, digunakan untuk mengurangi dimensi fitur dengan mengambil nilai maksimum (max pooling).
- - Flatten: Mengubah data 2D menjadi 1D sebelum diberikan ke lapisan fully connected.
- - Dense: Digunakan untuk membuat lapisan fully connected pada neural network.
+# Import Library
+![image](https://github.com/user-attachments/assets/95074d64-0230-47bf-b59a-613559b45741)
+- TensorFlow: Library yang digunakan untuk deep learning
+- cifar10: Dataset gambar CIFAR-10 yang berisi 60.000 gambar (32x32 piksel, 3 channel RGB) dengan 10 kelas.
+- to_categorical: Fungsi untuk mengubah label numerik ke bentuk one-hot encoding.
 
-# Membangun CNN:
-objek MesinKlasifikasi didefinisikan menggunakan Sequential, yang mengindikasikan urutan lapisan-lapisan CNN yang akan digunakan.
+# Memuat Dataset
+![image](https://github.com/user-attachments/assets/fd203237-61d2-4dfa-94ba-61d6e1406a05)
+- train_images, train_labels: Data gambar dan label untuk pelatihan.
+- test_images, test_labels: Data gambar dan label untuk pengujian.
 
-# Layer Convolution
-- Convolution2D dengan filter 32 dan ukuran kernel (3,3), yang artinya kita memiliki 32 detektor fitur untuk mendeteksi pola pada gambar. Gambar yang dimasukkan memiliki ukuran 128x128 piksel dan 3 saluran warna (RGB).
-- Fungsi aktivasi yang digunakan adalah ReLU (Rectified Linear Unit), yang umum digunakan dalam CNN karena efektif dalam mengatasi masalah vanishing gradient.
+# Normalisasi Data Gambar
+![image](https://github.com/user-attachments/assets/346e83e1-e20e-4bc2-9b89-b8b52dc2e151)
+- Data gambar dinormalisasi ke rentang [0, 1] dengan membagi setiap piksel (0-255) dengan 255.
+- astype('float32') memastikan data berada dalam format float32 untuk kompatibilitas dengan TensorFlow.
 
-# Max Pooling
-Menggunakan MaxPooling2D dengan ukuran pool (2,2), yang akan mengurangi ukuran gambar dan mempertahankan fitur terpenting dari gambar.
+# One-Hot Encoding Label
+![image](https://github.com/user-attachments/assets/9cd61415-cbf8-4555-a870-afb7961ca614)
+- Mengubah label numerik (0-9) menjadi bentuk one-hot encoding (contoh: 3 menjadi [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]).
+- 10 adalah jumlah kelas dalam dataset CIFAR-10.
 
-# Layer Convolution dan Pooling Tambahan
-Menambahkan layer convolution dan max pooling lainnya untuk meningkatkan kemampuan model dalam menangkap fitur yang lebih mendalam dan kompleks.
+# Membangun Model CNN
+![image](https://github.com/user-attachments/assets/01a7daec-234f-415d-930e-6e7a33b32a1d)
+- Sequential: Membuat model berlapis.
+- Conv2D: Layer konvolusi dengan filter dan ukuran kernel (3x3) untuk mengekstraksi fitur dari gambar.
+- input_shape=(32, 32, 3) menunjukkan dimensi input gambar (32x32 piksel, 3 channel RGB).
+- ReLU (Rectified Linear Unit): Fungsi aktivasi untuk meningkatkan non-linearitas.
+- MaxPooling2D: Mengurangi dimensi spasial gambar menggunakan pooling (2x2) untuk mengurangi kompleksitas.
+- Flatten: Mengubah data dari 2D menjadi 1D untuk diinputkan ke Dense Layer.
+- Dense: Layer fully connected untuk menggabungkan fitur.
+- Dense(128): Menggunakan 128 unit neuron.
+- Dropout(0.5): Mengatur dropout rate (50%) untuk mencegah overfitting.
+- Dense(10, activation='softmax'): Layer output dengan 10 unit (sesuai jumlah kelas) dan fungsi aktivasi softmax untuk klasifikasi.
 
-# Flattening
-Flatten() digunakan untuk mengubah data yang dihasilkan oleh layer pooling menjadi vektor satu dimensi, yang akan digunakan oleh lapisan fully connected.
+# Menampilkan Ringkasan Model
+![image](https://github.com/user-attachments/assets/11fd9d48-c7fd-4c7c-a416-ad6c77dce563)
+- Menampilkan arsitektur model, jumlah layer, dan parameter yang dapat di-train.
 
-# Layer Fully Connected
-- Menambahkan lapisan tersembunyi (hidden layer) dengan 128 neuron. Fungsi aktivasi yang digunakan adalah ReLU.
-- Mendefinisikan output layer dengan 1 neuron, karena ini adalah masalah klasifikasi biner (misalnya, mengklasifikasikan gambar menjadi "cat" atau "dog"), maka fungsi aktivasi yang digunakan adalah Sigmoid.
+# Kompilasi Model
+![image](https://github.com/user-attachments/assets/756e0a88-fcf5-4929-a468-fd616cf0a128)
+- Optimizer: adam, metode optimasi adaptif.
+- Loss function: categorical_crossentropy, digunakan untuk masalah klasifikasi multi-kelas.
+- Metrics: accuracy, metrik evaluasi untuk mengukur akurasi model.
 
-# Kompilasi Model 
-Mengkompilasi model dengan optimizer Adam, loss function binary crossentropy (karena ini masalah klasifikasi biner), dan metrik akurasi.
+# Melatih Model
+![image](https://github.com/user-attachments/assets/61d6ad52-9e02-4a2a-8bbe-f19ab3a5d136)
+- train_images, train_labels: Data pelatihan.
+- epochs=10: Model akan belajar selama 10 kali iterasi penuh terhadap data pelatihan.
+- batch_size=64: Data diproses dalam batch berisi 64 gambar.
+- validation_data: Menggunakan data pengujian untuk mengevaluasi performa model selama pelatihan.
 
-# Image Augmentation
-Untuk menghindari overfitting, kita menggunakan ImageDataGenerator untuk melakukan augmentasi gambar. Augmentasi gambar ini bisa mencakup rotasi, pemotongan, zooming, dan flipping gambar secara horizontal untuk menciptakan variasi gambar tanpa menambah data secara fisik.
+# Mengevaluasi Model
+![image](https://github.com/user-attachments/assets/cda5fb80-85ce-4525-b0ef-c4a5b450fe67)
+- test_loss, test_acc = model.evaluate(test_images, test_labels)
+- print('Test accuracy:', test_acc)
 
-# Pengaturan Data Augmentation:
-- Mendefinisikan objek train_datagen untuk augmentasi data latih dan objek test_datagen untuk data uji.
-- Pada objek train_datagen, kita menggunakan parameter seperti rescale, shear_range, zoom_range, dan horizontal_flip untuk memanipulasi gambar dan meningkatkan keragaman dataset.
-- test_datagen hanya menggunakan parameter rescale untuk normalisasi gambar uji.
+# Output yang dihasilkan :
+![image](https://github.com/user-attachments/assets/7c7b91c6-fb2c-439c-94ee-2148048ff5c7)
+![image](https://github.com/user-attachments/assets/d3666314-d093-416f-a856-1f8511fee23f)
 
-# Pembagian Data
-Mendefinisikan objek training_set dan test_set untuk memuat data latih dan data uji dari folder yang sudah disiapkan. Ukuran gambar dipastikan sesuai dengan yang didefinisikan sebelumnya (128x128).
+Setelah model CNN dibangun dan dilatih, kita dapat melakukan proses inference pada data gambar yang belum pernah dilihat sebelumnya. Model CNN akan memberikan prediksi kelas dari gambar tersebut berdasarkan apa yang telah dipelajari selama proses pelatihan. 
 
-# Pelatihan Model
-Melatih model menggunakan data latih dan menguji kinerjanya dengan data uji. Proses pelatihan dilakukan dalam beberapa epoch (iterasi), dan parameter seperti steps_per_epoch, validation_steps, dan epochs dikonfigurasi untuk menentukan seberapa lama model akan dilatih.
+# code 2
 
-# Evaluasi Model
-Setelah pelatihan selesai, kita akan melihat hasil pelatihan berupa nilai loss (kerugian) dan akurasi pada data latih dan data uji. Nilai akurasi yang lebih tinggi menunjukkan bahwa model berhasil mengenali pola dalam data uji.
-
-# Output yang dihasilkan
-![WhatsApp Image 2024-11-17 at 20 46 19_a154ed9a](https://github.com/user-attachments/assets/944c2d6c-a08e-4a6d-bf15-96ecbf07afb6)
-![WhatsApp Image 2024-11-17 at 20 46 52_7ecb05ae](https://github.com/user-attachments/assets/f5a9108c-6cae-4209-9f7b-aa75a7046eaa)
-Tampilan eksekusi epoch ke 50 di spyder
-Kita bisa melihat bahwa nilai loss di training set menjadi sangat kecil yaitu 0.8534. Walaupun nilainya sudah 0, namun dari iterasi epoch di atasnya nilai ini masih bisa terus turun (jadi bisa ditambah lagi jumlah epoch-nya).
-Kemudian nilai akurasinya sudah sangat tinggi yaitu 70%. Nilai ini juga masih bisa ditingkatkan lagi dengan menambah epoch nya.
